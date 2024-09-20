@@ -19,18 +19,18 @@ void fragment() {
 		texture(sim_tex, UV + duv.zy).r +
 		texture(sim_tex, UV - duv.xz).r +
 		texture(sim_tex, UV + duv.xz).r - 4.0 * c.r)) * attenuation;
-		
+
 	vec2 col_uv = vec2(UV.x, 1.0 - UV.y);
 	float col = texture(col_tex, col_uv).r;
 	float prevCol = texture(sim_tex, UV).b;
-	
-	if (col > 0.0 && prevCol == 0.0) {
+
+	if (col > 0.0 && (prevCol < 0.001 && prevCol > -0.001)) {
 		p += col * 0.5;
 	}
-	
-	if (prevCol > 0.0 && col == 0.0) {
+
+	if (prevCol > 0.0 && (col < 0.001 && col > -0.001)) {
 		p -= prevCol * 0.5;
 	}
-		
+
 	COLOR = vec4(p, c.r, col, 1);
 }

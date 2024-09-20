@@ -1,4 +1,4 @@
-[gd_resource type="VisualShader" load_steps=26 format=3 uid="uid://c7d7kiigmb7le"]
+[gd_resource type="VisualShader" load_steps=29 format=3 uid="uid://c7d7kiigmb7le"]
 
 [sub_resource type="VisualShaderNodeColorParameter" id="VisualShaderNodeColorParameter_jw5th"]
 parameter_name = "shallow_water"
@@ -10,7 +10,7 @@ default_input_values = [0, Vector3(0, 0, 0), 1, Vector3(1, 1, 1), 2, Vector3(0.5
 op_type = 3
 
 [sub_resource type="VisualShaderNodeExpression" id="VisualShaderNodeExpression_go6ns"]
-size = Vector2(501.944, 279.904)
+size = Vector2(500, 300)
 expression = "vec3 duv = vec3(4.0 / 514.0, 4.0 / 514.0, 0);
 float v1 = texture(sim, UV - duv.xz).y;
 float v2 = texture(sim, UV + duv.xz).y;
@@ -46,6 +46,16 @@ constant = 0.8
 parameter_name = "simulation"
 
 [sub_resource type="VisualShaderNodeLinearSceneDepth" id="VisualShaderNodeLinearSceneDepth_27hr3"]
+
+[sub_resource type="VisualShaderNodeTexture" id="VisualShaderNodeTexture_0ij0k"]
+source = 5
+
+[sub_resource type="VisualShaderNodeMultiplyAdd" id="VisualShaderNodeMultiplyAdd_86m1o"]
+default_input_values = [0, Vector3(0, 0, 0), 1, Vector3(0.5, 0.5, 0.5), 2, Vector3(0.5, 0.5, 0.5)]
+op_type = 2
+
+[sub_resource type="VisualShaderNodeVectorCompose" id="VisualShaderNodeVectorCompose_ef8h3"]
+default_input_values = [0, 0.5, 1, 0.5, 2, 0.5]
 
 [sub_resource type="VisualShaderNodeExpression" id="VisualShaderNodeExpression_bxgl8"]
 size = Vector2(512.6, 290.56)
@@ -236,15 +246,26 @@ void fragment() {
 	float n_out8p0 = 1.0 - n_out6p0;
 
 
+// VectorCompose:24
+	float n_in24p0 = 0.50000;
+	float n_in24p1 = 0.50000;
+	float n_in24p2 = 0.50000;
+	vec3 n_out24p0 = vec3(n_in24p0, n_in24p1, n_in24p2);
+
+
+// MultiplyAdd:23
+	vec3 n_out23p0 = fma(n_out12p0, n_out24p0, n_out24p0);
+
+
 // Output:0
 	ALBEDO = n_out18p0;
 	ALPHA = n_out8p0;
-	NORMAL = n_out12p0;
+	NORMAL_MAP = n_out23p0;
 
 
 }
 "
-graph_offset = Vector2(-1091.11, -508.067)
+graph_offset = Vector2(-497.608, -324.706)
 nodes/vertex/0/position = Vector2(660, 40)
 nodes/vertex/2/node = SubResource("VisualShaderNodeInput_olx2s")
 nodes/vertex/2/position = Vector2(-820, 100)
@@ -286,7 +307,7 @@ nodes/fragment/11/node = SubResource("VisualShaderNodeMix_mhput")
 nodes/fragment/11/position = Vector2(2.72259, 77.1215)
 nodes/fragment/12/node = SubResource("VisualShaderNodeExpression_go6ns")
 nodes/fragment/12/position = Vector2(-380, -460)
-nodes/fragment/12/size = Vector2(501.944, 279.904)
+nodes/fragment/12/size = Vector2(500, 300)
 nodes/fragment/12/input_ports = "0,8,sim;"
 nodes/fragment/12/output_ports = "0,4,normal;"
 nodes/fragment/12/expression = "vec3 duv = vec3(4.0 / 514.0, 4.0 / 514.0, 0);
@@ -314,4 +335,10 @@ nodes/fragment/20/node = SubResource("VisualShaderNodeTexture2DParameter_75g8n")
 nodes/fragment/20/position = Vector2(-780, -440)
 nodes/fragment/21/node = SubResource("VisualShaderNodeLinearSceneDepth_27hr3")
 nodes/fragment/21/position = Vector2(-640, 580)
-nodes/fragment/connections = PackedInt32Array(7, 0, 6, 0, 6, 0, 8, 0, 9, 0, 11, 0, 10, 0, 11, 1, 12, 0, 0, 8, 13, 0, 14, 0, 12, 0, 14, 1, 14, 0, 15, 0, 16, 0, 15, 1, 15, 0, 17, 0, 17, 0, 18, 0, 11, 0, 18, 1, 19, 0, 18, 2, 20, 0, 12, 0, 21, 0, 6, 1, 6, 0, 11, 2, 18, 0, 0, 0, 8, 0, 0, 1)
+nodes/fragment/22/node = SubResource("VisualShaderNodeTexture_0ij0k")
+nodes/fragment/22/position = Vector2(120, -180)
+nodes/fragment/23/node = SubResource("VisualShaderNodeMultiplyAdd_86m1o")
+nodes/fragment/23/position = Vector2(660, 320)
+nodes/fragment/24/node = SubResource("VisualShaderNodeVectorCompose_ef8h3")
+nodes/fragment/24/position = Vector2(420, 500)
+nodes/fragment/connections = PackedInt32Array(7, 0, 6, 0, 6, 0, 8, 0, 9, 0, 11, 0, 10, 0, 11, 1, 13, 0, 14, 0, 12, 0, 14, 1, 14, 0, 15, 0, 16, 0, 15, 1, 15, 0, 17, 0, 17, 0, 18, 0, 11, 0, 18, 1, 19, 0, 18, 2, 20, 0, 12, 0, 21, 0, 6, 1, 6, 0, 11, 2, 8, 0, 0, 1, 20, 0, 22, 2, 18, 0, 0, 0, 12, 0, 23, 0, 23, 0, 0, 9, 24, 0, 23, 1, 24, 0, 23, 2)
